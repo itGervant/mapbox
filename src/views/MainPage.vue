@@ -58,7 +58,7 @@ export default {
   
 <style>
 #map {
-    height: 800px;
+    height: 100vh;
     border: 5px solid gray;
 
 }

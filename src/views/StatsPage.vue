@@ -4,15 +4,12 @@
             <span>Статистика интеграторов</span>
             <span>Voicelink: {{ integratorVoice }}</span>
             <span>Komsignal: {{ integratorKoms }}</span>
-        </div> 
+        </div>
         <BarChart class="chart" :chartData="chartData" />
 
     </div>
 </template>
-  
-
  
-  
 <script>
 import BarChart from '../components/BarChart.vue'
 import { mapState } from 'vuex';
@@ -32,7 +29,7 @@ export default {
                     {
                         label: 'Светофоры',
                         data: [notWork, work],
-                        backgroundColor: ['red','lightgreen'],
+                        backgroundColor: ['red', 'lightgreen'],
                     }
                 ]
             };
@@ -68,11 +65,29 @@ export default {
 
 .statistics {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    width: 1600px;
-    margin: 0 auto;
+    margin: 0 60px;
     padding-top: 80px;
+}
+
+@media (max-width: 1150px) {
+    .statistics {
+        flex-direction: column;
+        margin: 0 auto;
+        padding-top: 40px;
+    }
+
+    .integrators {
+        font-size: 25px;
+        margin-bottom: 40px;
+
+    }
+
+    .chart {
+        height: 300px;
+    }
 }
 </style>
   

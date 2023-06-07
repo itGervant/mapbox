@@ -13,12 +13,12 @@ export default {
   components: { Bar },
   props: {
     chartData: {
-        type: Object,
-        required: true
-      },
+      type: Object,
+      required: true
+    },
     chartOptions: {
       type: Object,
-      default: () => {}
+      default: () => { }
     }
   }
 }

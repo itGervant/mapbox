@@ -1,10 +1,10 @@
 <template>
     <div class="container">
         <div class="selects">
-            <my-select label="Сортировка по ID:" v-model="sortByID" :options="sortOptions"></my-select>
-            <my-select label="Сортировка по имени:" v-model="sortByName" :options="sortOptions"></my-select>
-            <my-select label="Фильтр по статусу:" v-model="filterByStatus" :options="statusOptions"></my-select>
-            <my-select label="Фильтр по интегратору:" v-model="filterByIntegrator" :options="integratorOptions"></my-select>
+            <my-select label="Сортировка по ID:" v-model="sortByID" :options="filters.sort"></my-select>
+            <my-select label="Сортировка по имени:" v-model="sortByName" :options="filters.sort"></my-select>
+            <my-select label="Фильтр по статусу:" v-model="filterByStatus" :options="filters.status"></my-select>
+            <my-select label="Фильтр по интегратору:" v-model="filterByIntegrator" :options="filters.integrator"></my-select>
         </div>
         <div class="items" v-for="marker in filteredMarkers" :key="marker.id">
             <div class="item-id">{{ marker.id }}</div>
@@ -18,13 +18,33 @@
 <script>
 import MySelect from '../components/MySelect'
 
+const FILTERS = {
+    status: [
+        { label: "Все", value: "" },
+        { label: "3 - работает", value: "3" },
+        { label: "255 - нет сигнала", value: "255" }
+    ],
+    integrator: [
+        { label: "Все", value: "" },
+        { label: "voicelink", value: "voicelink" },
+        { label: "komsignal", value: "komsignal" }
+    ],
+    sort: [
+        { label: "Не сортировать", value: "" },
+        { label: "По возрастанию", value: "asc" },
+        { label: "По убыванию", value: "desc" }
+    ]
+};
+
 export default {
     components: { MySelect },
     computed: {
+        filters() {
+            return FILTERS;
+        },
         markersData() {
             return this.$store.getters.markersData;
         },
-
         filteredMarkers() {
             let filteredData = [...this.markersData];
 
@@ -40,49 +60,36 @@ export default {
                 );
             }
 
-            if (this.sortByName) {
+            if (this.sortByName || this.sortByID) {
                 filteredData.sort((a, b) => {
-                    if (this.sortByName === "asc") {
-                        return a.name.localeCompare(b.name);
-                    } else {
-                        return b.name.localeCompare(a.name);
+                    if (this.sortByName) {
+                        if (this.sortByName === "asc") {
+                            const nameComparison = a.name.localeCompare(b.name);
+                            if (nameComparison !== 0) {
+                                return nameComparison;
+                            }
+                        } else {
+                            const nameComparison = b.name.localeCompare(a.name);
+                            if (nameComparison !== 0) {
+                                return nameComparison;
+                            }
+                        }
                     }
-                });
-            }
 
-            if (this.sortByID) {
-                filteredData.sort((a, b) => {
-                    if (this.sortByID === "asc") {
-                        return a.id - b.id;
-                    } else {
-                        return b.id - a.id;
+                    if (this.sortByID) {
+                        if (this.sortByID === "asc") {
+                            return a.id - b.id;
+                        } else {
+                            return b.id - a.id;
+                        }
                     }
+
+                    return 0;
                 });
             }
 
             return filteredData;
         },
-        sortOptions() {
-            return [
-                { label: "Не сортировать", value: "" },
-                { label: "По возрастанию", value: "asc" },
-                { label: "По убыванию", value: "desc" }
-            ];
-        },
-        statusOptions() {
-            return [
-                { label: "Все", value: "" },
-                { label: "3 - работает", value: "3" },
-                { label: "255 - нет сигнала", value: "255" }
-            ];
-        },
-        integratorOptions() {
-            return [
-                { label: "Все", value: "" },
-                { label: "voicelink", value: "voicelink" },
-                { label: "komsignal", value: "komsignal" }
-            ];
-        }
     },
     data() {
         return {
@@ -95,60 +102,99 @@ export default {
     mounted() {
         this.$store.dispatch("fetchMarkersData");
     },
-
 };
 </script>
   
-
-  
-
 <style>
-    .container {
-        margin: 20px;
-  
-    }
+.container {
+    margin: 20px;
+}
 
+.selects {
+    margin: 20px auto;
+    grid-column: 1/4;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-gap: 10px;
+}
+
+.items {
+    grid-column: 1/4;
+    display: grid;
+    grid-template-columns: 40px 2fr 40px 1fr;
+    grid-gap: 10px;
+}
+
+.item-id {
+    grid-column: 1;
+    border: 1px solid gray;
+    padding: 5px;
+}
+
+.item-name {
+    grid-column: 2;
+    border: 1px solid gray;
+    padding: 5px;
+}
+
+.item-status {
+    grid-column: 3;
+    border: 1px solid gray;
+    padding: 5px;
+}
+
+.item-integrator {
+    grid-column: 4;
+    border: 1px solid gray;
+    padding: 5px;
+}
+
+@media (max-width: 769px) {
     .selects {
-        margin: 20px auto;
-        grid-column: 1/4;
-        display: grid;
         grid-template-columns: repeat(4, 1fr);
-        grid-gap: 10px;
     }
 
     .items {
-        grid-column: 1/4;
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        grid-gap: 10px;
-        
-        
+        grid-gap: 0;
+        grid-template-columns: 40px 2fr 40px 1fr;
     }
 
-    .item-id {
-        grid-column: 1;
-        border: 1px solid gray;
-        padding: 5px;
-
+    @media (max-width: 600px) {
+        .selects {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        .item-id,
+        .item-name,
+        .item-status,
+        .item-integrator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid gray;
+            padding: 2px;
+        }
     }
 
-    .item-name {
-        grid-column: 2;
-        border: 1px solid gray;
-        padding: 5px;
+    @media (max-width: 425px) {
+        .selects {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .items {
+            grid-gap: 0;
+            grid-template-columns: 40px 2fr 40px 1fr;
+        }
     }
 
-    .item-status {
-        grid-column: 3;
-        border: 1px solid gray;
-        padding: 5px;
-    }
+    @media (max-width: 370px) {
+        .items {
+            grid-gap: 0;
+            grid-template-columns: 30px 2fr 30px 1fr;
+        }
 
-    .item-integrator {
-        grid-column: 4;
-        border: 1px solid gray;
-        padding: 5px;
+
     }
+}
 </style>
 
 

@@ -46,6 +46,8 @@
     border:  1px solid gray;
     border-radius: 8px;
     padding: 5px;
+    justify-content: space-between;
   }
+
   </style>
   
